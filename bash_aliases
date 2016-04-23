@@ -1,7 +1,9 @@
 
-alias ls='ls -GFh --color'
-# alias v='vim'
-alias tux='ssh tux'
-alias mtux='sshfs tux:/home/jk993 ~/Desktop/Tux'
-alias untux='fusermount -u ~/Desktop/Tux'
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias v='vim'
 
