@@ -1,0 +1,13 @@
+syntax on
+set number
+set colorcolumn=80
+set autoread         
+
+set encoding=utf-8
+set fileencoding=utf-8
+
+set tabstop=4
+
+color torte
+
+set listchars=tab:▸\
