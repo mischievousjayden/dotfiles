@@ -35,13 +35,18 @@ Plugin 'VundleVim/Vundle.vim'
 
 " < Custom Plugin >
 " autocomplete
-Plugin 'ervandew/supertab'
+" Plugin 'ervandew/supertab'
+Plugin 'valloric/youcompleteme'
 
 " check syntax
 Plugin 'scrooloose/syntastic'
 
 " comment tool
 Plugin 'tomtom/tcomment_vim'
+
+" display indent
+Plugin 'nathanaelkane/vim-indent-guides'
+
 
 call vundle#end()            " required
 filetype plugin indent on    " required
