@@ -34,14 +34,26 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 " < Custom Plugin >
-" autocomplete
-" Plugin 'ervandew/supertab'
+" [autocomplete]
+" pacman -Sy clang cmake
+"
+" Go support: install Go and add it to your path.
+" cd ~/.vim/bundle/youcompleteme/third_party/ycmd/third_party/gocode
+" go build
+"
+"JavaScript support: install Node.js and npm. Then navigate to
+" cd ~/.vim/bundle/youcompleteme/third_party/ycmd/third_party/tern_runtime
+" npm install --production.
+"
+" cd ~/.vim/bundle/youcompleteme
+" ./install.py --clang-completer --system-libclang --gocode-completer --tern-completer
+
 Plugin 'valloric/youcompleteme'
 
-" check syntax
+" [check syntax] 
 Plugin 'scrooloose/syntastic'
 
-" comment tool
+" [comment tool]
 Plugin 'tomtom/tcomment_vim'
 
 " display indent
