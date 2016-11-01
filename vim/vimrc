@@ -35,6 +35,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 " < Custom Plugin >
 " [autocomplete]
+" sudo apt-get install build-essential cmake
 " pacman -Sy clang cmake
 "
 " Go support: install Go and add it to your path.
