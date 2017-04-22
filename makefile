@@ -3,5 +3,5 @@ all: vim
 
 
 vim:
-	./vimsetting/vim_init.sh
+	cd vimsetting && ./vim_init.sh
 
