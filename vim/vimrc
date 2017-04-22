@@ -1,77 +1,52 @@
-" <----------   CUSTOMIZATION   ---------->
+" <---  COLOR  --->
+colorscheme ron " set colorscheme
 
-syntax on
-set number
-set colorcolumn=80
-set autoread
-
-" set encoding utf 8
-set encoding=utf-8
-set fileencoding=utf-8
-
-" set tab
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set expandtab
-set smarttab
-
-color ron
-set listchars=tab:▸\
+if !exists("g:syntax_on")
+    syntax enable " enable syntax highlight
+endif
 
 
-" <----------   VUNDLE & PLUGIN   ---------->
-set nocompatible              " be iMproved, required
-filetype off                  " required
-
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" < Custom Plugin >
-" [autocomplete]
-" sudo apt-get install build-essential cmake
-" pacman -Sy clang cmake
-"
-" Go support: install Go and add it to your path.
-" cd ~/.vim/bundle/youcompleteme/third_party/ycmd/third_party/gocode
-" go build
-"
-"JavaScript support: install Node.js and npm. Then navigate to
-" cd ~/.vim/bundle/youcompleteme/third_party/ycmd/third_party/tern_runtime
-" npm install --production.
-"
-" cd ~/.vim/bundle/youcompleteme
-" ./install.py --clang-completer --system-libclang --gocode-completer --tern-completer
-
-Plugin 'valloric/youcompleteme'
-
-" [check syntax] 
-Plugin 'scrooloose/syntastic'
-
-" [comment tool]
-Plugin 'tomtom/tcomment_vim'
-
-" display indent
-Plugin 'nathanaelkane/vim-indent-guides'
+" <---  TAB  --->
+set tabstop=4 " change display tab size
+set softtabstop=4 " change insert tab size
+set shiftwidth=4 " change shift tab size
+set expandtab " convert tab to space
+" set shiftround " 
+" set smarttab "
+set autoindent " inherit the indentation from above line
+filetype indent on " enable indentation rules that are file-type specific
 
 
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+" <---  SEARCH  --->
+set hlsearch " enable serch highlighting
+nmap <leader><space> :nohlsearch<CR> " map key to clear highlight
+
+
+" <---  UI  --->
+set number " turn on line number
+" set relativenumber " turn on relative number
+function! TChangeNumbering() " change numbering between number and relativenumber
+    set number! " toggle line number
+    set relativenumber! " toggle relative number
+endfunc
+nmap <leader>n :call TChangeNumbering()<cr> " map key to call TChangeNumbering()
+
+set listchars=tab:▸\ ,eol:¬ " set invisible characters
+nmap <leader>l :set list!<CR> " map key to toggle list
+" function! TList() " toggle display invisibles
+"     set list! " set shortcut to toggle list
+" endfunc
+" nmap <leader>l :call TList()<cr> " map key to call TList()
+
+set colorcolumn=80 " make red column
+" set mouse=a " enable mouse
+" set showcmd " display command on bottom
+" set cursorline " make cursorline for current line
+" set clipboard=unnamedplus
+
+
+" <---  PLUGIN  --->
+" [ pathogen ]
+execute pathogen#infect()
+
 
