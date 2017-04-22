@@ -1,3 +1,7 @@
+" set autoread
+" set encoding=utf-8
+" set fileencoding=utf-8
+
 " <---  COLOR  --->
 colorscheme ron " set colorscheme
 
@@ -12,7 +16,7 @@ set softtabstop=4 " change insert tab size
 set shiftwidth=4 " change shift tab size
 set expandtab " convert tab to space
 " set shiftround " 
-" set smarttab "
+set smarttab "
 set autoindent " inherit the indentation from above line
 filetype indent on " enable indentation rules that are file-type specific
 
@@ -38,6 +42,7 @@ nmap <leader>l :set list!<CR> " map key to toggle list
 " endfunc
 " nmap <leader>l :call TList()<cr> " map key to call TList()
 
+nmap <leader>w :set wrap!<CR> " toggle wrapping code
 set colorcolumn=80 " make red column
 " set mouse=a " enable mouse
 " set showcmd " display command on bottom
