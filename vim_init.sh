@@ -12,5 +12,5 @@ curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 cd vim && git submodule update --init --recursive
 
 # youcompleteme install
-# cd vim/bundle/youcompleteme  && git submodule update --init --recursive
+cd vim/bundle/youcompleteme && ./install.py --clang-completer --system-libclang --gocode-completer --tern-completer
 
