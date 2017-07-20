@@ -2,4 +2,5 @@
 
 ln -s $PWD/npmrc $HOME/.npmrc
 mkdir -p $HOME/.npm-packages
+npm install -g typescript
 

@@ -1,10 +1,10 @@
 
-all: vim, npm
+all: npminit viminit
 
 
-vim:
-	cd vimsetting && ./vim_init.sh
-
-npm:
+npminit:
 	cd npm && ./npm_init.sh
+
+viminit:
+	cd vimsetting && ./vim_init.sh
 
