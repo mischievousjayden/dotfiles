@@ -1,10 +1,16 @@
 
-all: npminit viminit
+all: shellinit npminit viminit
 
+
+shellinit:
+	cd shell/bash && ./bash_init.sh
 
 npminit:
 	cd npm && ./npm_init.sh
 
 viminit:
-	cd vimsetting && ./vim_init.sh
+	cd vim && ./vim_init.sh
+
+clean:
+	cd ~ && rm -rf .npm .npm-packages .npmrc .vim .vimrc
 
