@@ -12,6 +12,6 @@ curl -LSso $HOME/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 git submodule update --init --recursive
 
 # youcompleteme install
-# cd $HOME/.vim/bundle/youcompleteme && ./install.py --clang-completer --system-libclang --gocode-completer --tern-completer
-cd $HOME/.vim/bundle/youcompleteme && ./install.py --gocode-completer --tern-completer
+# cd $HOME/.vim/bundle/YouCompleteMe && ./install.py --clang-completer --system-libclang --gocode-completer --tern-completer
+cd $HOME/.vim/bundle/YouCompleteMe && ./install.py --gocode-completer --tern-completer
 
