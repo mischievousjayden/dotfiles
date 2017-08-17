@@ -1,6 +1,6 @@
-[submodule "vimsetting/vim/bundle/youcompleteme"]
-	path = vimsetting/vim/bundle/youcompleteme
-	url = https://github.com/valloric/youcompleteme
-[submodule "vimsetting/vim/bundle/tcomment_vim"]
-	path = vimsetting/vim/bundle/tcomment_vim
+[submodule "vim/vim/bundle/tcomment_vim"]
+	path = vim/vim/bundle/tcomment_vim
 	url = https://github.com/tomtom/tcomment_vim
+[submodule "vim/vim/bundle/youcompleteme"]
+	path = vim/vim/bundle/youcompleteme
+	url = https://github.com/valloric/youcompleteme

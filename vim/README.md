@@ -3,5 +3,6 @@
 - how to vimrc: https://dougblack.io/words/a-good-vimrc.html
 - top 50 vim configuration options: https://www.shortcutfoo.com/blog/top-50-vim-configuration-options/
 - show invisibles: http://vimcasts.org/episodes/show-invisibles/
+- pathogen git submodule: http://vimcasts.org/episodes/synchronizing-plugins-with-git-submodules-and-pathogen/
 - example vimrc: https://github.com/daniiln/dotfiles/tree/master/vim
 

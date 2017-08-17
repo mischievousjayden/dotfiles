@@ -55,3 +55,8 @@ set colorcolumn=80 " make red column
 execute pathogen#infect()
 
 
+" <--- Project Specific .vimrc --->
+" reference: https://andrew.stwrt.ca/posts/project-specific-vimrc/
+set exrc
+set secure
+

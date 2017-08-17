@@ -12,5 +12,5 @@ viminit:
 	cd vim && ./vim_init.sh
 
 clean:
-	cd ~ && rm -rf .npm .npm-packages .npmrc .vim .vimrc
+	cd ~ && rm -rf .bashrc .bash_aliases .npm .npm-packages .npmrc .vim .vimrc
 
