@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# link vimrc
+# link config
 ln -s $PWD/vim $HOME/.vim
 ln -s $PWD/vim/vimrc $HOME/.vimrc
 
-# # install pathogen
+# install pathogen
 mkdir -p $HOME/.vim/autoload
 curl -LSso $HOME/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 

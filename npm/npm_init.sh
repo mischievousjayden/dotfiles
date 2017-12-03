@@ -1,6 +1,11 @@
 #!/bin/bash
 
+# link config
 ln -s $PWD/npmrc $HOME/.npmrc
+
+# make directory for packages
 mkdir -p $HOME/.npm-packages
-npm install -g typescript
+
+# install packages
+# npm install -g typescript
 
