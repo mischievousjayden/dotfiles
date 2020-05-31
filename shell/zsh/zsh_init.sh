@@ -1,11 +1,7 @@
 #!/bin/zsh
 
-git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
-
-setopt EXTENDED_GLOB
-for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
-    ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
-done
-
-# chsh -s /bin/zsh
+# link config
+ln -s $PWD/zshrc ${ZDOTDIR:-$HOME}/.zshrc
+ln -s $PWD/../common/common_alias ${ZDOTDIR:-$HOME}/.zsh_alias
+ln -s $PWD/../common/common_function ${ZDOTDIR:-$HOME}/.zsh_function
 
