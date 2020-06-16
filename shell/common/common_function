@@ -1,0 +1,48 @@
+function parse_git_info {
+    git_branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+    if [[ "${git_branch}" == "" ]]; then
+        echo ""
+    else
+        git_status=`git status 2>&1 | tee`
+        ahead=`echo -n "${git_status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
+        staged=`echo -n "${git_status}" 2> /dev/null | grep "Changes to be committed" &> /dev/null; echo "$?"`
+        unstaged=`echo -n "${git_status}" 2> /dev/null | grep "Changes not staged for commit" &> /dev/null; echo "$?"`
+        untracked=`echo -n "${git_status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
+        modified=`echo -n "${git_status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
+        newfile=`echo -n "${git_status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
+        deleted=`echo -n "${git_status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
+        renamed=`echo -n "${git_status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
+
+        git_status=''
+        if [[ "${ahead}" == "0" ]]; then
+            git_status="${git_status}^"
+        fi
+        if [[ "${staged}" == "0" ]]; then
+            git_status="${git_status}*"
+        fi
+        if [[ "${unstaged}" == "0" ]]; then
+            git_status="${git_status}."
+        fi
+        if [[ "${untracked}" == "0" ]]; then
+            git_status="${git_status}?"
+        fi
+        if [[ "${modified}" == "0" ]]; then
+            git_status="${git_status}x"
+        fi
+        if [[ "${newfile}" == "0" ]]; then
+            git_status="${git_status}+"
+        fi
+        if [[ "${deleted}" == "0" ]]; then
+            git_status="${git_status}-"
+        fi
+        if [[ "${renamed}" == "0" ]]; then
+            git_status="${git_status}>"
+        fi
+        if [[ "${git_status}" == "" ]]; then
+            echo " (${git_branch})"
+        else
+            echo " (${git_branch} ${git_status})"
+        fi
+    fi
+}
+

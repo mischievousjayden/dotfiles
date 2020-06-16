@@ -1,0 +1,94 @@
+# reference
+# https://scriptingosx.com/2019/06/moving-to-zsh/
+# https://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html
+# https://gist.github.com/LukeSmithxyz/e62f26e55ea8b0ed41a65912fbebbe52
+# https://wiki.archlinux.org/index.php/zsh
+# http://zsh.sourceforge.net/Doc/Release/zsh_toc.html#SEC_Contents
+
+
+###############################################################################
+#                               setup history                                 #
+###############################################################################
+# history setup
+HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
+HISTSIZE=10000 # number of commands in shell memory
+HISTFILESIZE=100000 # number of commands in history file
+
+# history with timestamp
+setopt EXTENDED_HISTORY
+# share history across multiple zsh sessions
+setopt SHARE_HISTORY
+# append to history
+setopt APPEND_HISTORY
+# # adds commands as they are typed, not at shell exit
+# setopt INC_APPEND_HISTORY
+
+# expire duplicates first
+setopt HIST_EXPIRE_DUPS_FIRST 
+# do not store duplications
+setopt HIST_IGNORE_DUPS
+# setopt HIST_IGNORE_ALL_DUPS
+#ignore duplicates when searching
+setopt HIST_FIND_NO_DUPS
+# removes blank lines from history
+setopt HIST_REDUCE_BLANKS
+
+
+###############################################################################
+#                           setup auto complete                               #
+###############################################################################
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+
+
+###############################################################################
+#                             setup correction                                #
+###############################################################################
+# setopt CORRECT
+# setopt CORRECT_ALL
+
+
+###############################################################################
+#                              setup git                                      #
+###############################################################################
+# use custom git setup
+if [ -f ${ZDOTDIR:-$HOME}/.zsh_function ]; then
+    . ${ZDOTDIR:-$HOME}/.zsh_function
+
+    function get_git_info {
+        git_info=`parse_git_info`
+    }
+# if no custom git setup, use vcs_info
+else
+    autoload -Uz vcs_info
+    zstyle ':vcs_info:*' disable ALL
+    zstyle ':vcs_info:*' enable git
+    zstyle ':vcs_info:git:*' check-for-changes true
+    zstyle ':vcs_info:git:*' unstagedstr '.'
+    zstyle ':vcs_info:git:*' stagedstr '*'
+    zstyle ':vcs_info:git:*' formats "(%b %u%c) %m"
+
+    function get_git_info {
+        vcs_info
+        git_info=$vcs_info_msg_0_
+    }
+fi
+precmd_functions+=( get_git_info )
+
+
+###############################################################################
+#                               setup prompt                                  #
+###############################################################################
+autoload -U colors && colors
+setopt PROMPT_SUBST
+# PROMPT='[%F{white}%*%f %F{red}%B%n%b%f@%F{green}%m%f %F{cyan}%~%f%F{yello}${git_info}%f] %(!.#.>) '
+PS1='[%F{white}%*%f %F{red}%B%n%b%f@%F{green}%m%f %F{cyan}%~%f%F{yello}${git_info}%f] %# '
+
+
+###############################################################################
+#                                setup alias                                  #
+###############################################################################
+if [ -f ${ZDOTDIR:-$HOME}/.zsh_alias ]; then
+    . ${ZDOTDIR:-$HOME}/.zsh_alias
+fi
+
