@@ -92,3 +92,6 @@ if [ -f ${ZDOTDIR:-$HOME}/.zsh_alias ]; then
     . ${ZDOTDIR:-$HOME}/.zsh_alias
 fi
 
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
