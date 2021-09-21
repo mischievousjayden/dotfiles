@@ -1,7 +1,4 @@
 [submodule "vim/vim/bundle/tcomment_vim"]
 	path = vim/vim/bundle/tcomment_vim
 	url = https://github.com/tomtom/tcomment_vim
-[submodule "vim/vim/bundle/YouCompleteMe"]
-	path = vim/vim/bundle/YouCompleteMe
-	url = https://github.com/Valloric/YouCompleteMe.git
     ignore = dirty
