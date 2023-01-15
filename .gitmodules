@@ -1,4 +1,6 @@
-[submodule "vim/vim/bundle/tcomment_vim"]
-	path = vim/vim/bundle/tcomment_vim
-	url = https://github.com/tomtom/tcomment_vim
-    ignore = dirty
+[submodule "vim/vim/pack/minpac/opt/minpac"]
+	path = vim/vim/pack/minpac/opt/minpac
+	url = https://github.com/k-takata/minpac.git
+[submodule "vim/vim/pack/minpac/opt/tcomment_vim"]
+	path = vim/vim/pack/minpac/opt/tcomment_vim
+	url = https://github.com/tomtom/tcomment_vim.git
