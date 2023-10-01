@@ -77,12 +77,31 @@ precmd_functions+=( get_git_info )
 
 
 ###############################################################################
+#                              setup k8s                                      #
+###############################################################################
+# use custom git setup
+if [ -f ${ZDOTDIR:-$HOME}/.zsh_function ]; then
+    . ${ZDOTDIR:-$HOME}/.zsh_function
+
+    function get_current_k8s_context {
+        k8s_context=`get_k8s_context`
+    }
+# if no custom git setup, use vcs_info
+else
+    function get_current_k8s_context {
+        k8s_context=''
+    }
+fi
+precmd_functions+=( get_current_k8s_context )
+
+
+###############################################################################
 #                               setup prompt                                  #
 ###############################################################################
 autoload -U colors && colors
 setopt PROMPT_SUBST
 # PROMPT='[%F{white}%*%f %F{red}%B%n%b%f@%F{green}%m%f %F{cyan}%~%f%F{yello}${git_info}%f] %(!.#.>) '
-PS1='[%F{white}%*%f %F{red}%B%n%b%f@%F{green}%m%f %F{cyan}%~%f%F{yello}${git_info}%f] %# '
+PS1='[%F{white}%*%f %F{red}%B%n%b%f@%F{green}%m%f %F{cyan}%~%f%F{yello}${git_info}%f%F{blue}${k8s_context}%f] %# '
 
 
 ###############################################################################

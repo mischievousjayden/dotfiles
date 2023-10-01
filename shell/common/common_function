@@ -1,4 +1,9 @@
 function parse_git_info {
+    if ! command -v git &> /dev/null; then
+        echo ""
+        return
+    fi
+
     git_branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
     if [[ "${git_branch}" == "" ]]; then
         echo ""
@@ -46,3 +51,12 @@ function parse_git_info {
     fi
 }
 
+function get_k8s_context {
+    if ! command -v kubectl &> /dev/null; then
+        echo ""
+        return
+    fi
+
+    k8_context=`kubectl config current-context`
+    echo " (${k8_context})"
+}
