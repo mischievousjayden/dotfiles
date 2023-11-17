@@ -57,6 +57,6 @@ function get_k8s_context {
         return
     fi
 
-    k8_context=`kubectl config current-context`
+    k8_context=`kubectl config current-context 2> /dev/null`
     echo " (${k8_context})"
 }
