@@ -51,13 +51,13 @@ set colorcolumn=80 " make red column
 
 
 " <---  PLUGIN  --->
-" [ minpac ]
-packadd minpac
-command! PackUpdate call minpac#update()
-command! PackClean call minpac#clean()
-call minpac#init()
-call minpac#add('https://github.com/tomtom/tcomment_vim.git')
-" call minpac#add('https://github.com/neoclide/coc.nvim.git')
+" " [ minpac ]
+" packadd minpac
+" command! PackUpdate call minpac#update()
+" command! PackClean call minpac#clean()
+" call minpac#init()
+" call minpac#add('https://github.com/tomtom/tcomment_vim.git')
+" " call minpac#add('https://github.com/neoclide/coc.nvim.git')
 
 
 " <--- Project Specific .vimrc --->
