@@ -1,0 +1,4 @@
+" In ~/.config/nvim/init.vim
+if filereadable(expand("~/.vimrc"))
+        source ~/.vimrc
+endif
