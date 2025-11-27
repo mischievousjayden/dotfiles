@@ -3,7 +3,7 @@
 " set fileencoding=utf-8
 
 " <---  COLOR  --->
-colorscheme ron " set colorscheme
+colorscheme sorbet " set colorscheme
 
 if !exists("g:syntax_on")
     syntax enable " enable syntax highlight
