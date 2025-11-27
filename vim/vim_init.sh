@@ -15,6 +15,9 @@ VIMRC_FILE="$HOME"/.vimrc
 [ -f "$VIMRC_FILE" ] && mv "$VIMRC_FILE" "$VIMRC_FILE".backup
 ln -s "$PWD"/vimrc "$VIMRC_FILE"
 
-# install vim bundle 
-git submodule update --init --recursive
-
+# install submodules
+if command -v git &>/dev/null; then
+    git submodule update --init --recursive
+else
+    echo "git not found — can't pull submodules"
+fi
