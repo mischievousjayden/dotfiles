@@ -1,7 +1,9 @@
 # Setup Vim Config
 
 ## Setup the config
+```
 bash vim_init.sh
+```
 
 ## Add plugin
 ```
