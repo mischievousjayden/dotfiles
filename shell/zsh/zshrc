@@ -114,3 +114,16 @@ fi
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+
+###############################################################################
+#                              setup custom zshrc                             #
+###############################################################################
+# Folder containing custom zshrc files
+CUSTOM_ZSHRC_DIR="${ZDOTDIR:-$HOME}/.custom_zshrc"
+
+# Source all .zsh files in that folder, sorted by name
+if [ -d "$CUSTOM_ZSHRC_DIR" ]; then
+    for rcfile in "$CUSTOM_ZSHRC_DIR"/*; do
+        [ -f "$rcfile" ] && source "$rcfile"
+    done
+fi
