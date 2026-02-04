@@ -1,0 +1,35 @@
+#!/bin/sh
+
+get_credentials () {
+    profile_name=$1
+    credentials_filename=$2
+
+    rm -rf $credentials_filename
+    mkdir -p "$(dirname "$credentials_filename")"
+
+    aws sso login --profile $profile_name
+
+    aws_credentials=$(aws configure export-credentials --profile $profile_name --format env)
+
+    echo "export AWS_PROFILE=$profile_name" >> $credentials_filename
+    echo "$aws_credentials" >> $credentials_filename
+    cat $credentials_filename
+}
+
+profile_name="${1:-default}"
+default_credentials_filename="$HOME/tmp/aws_credentials/$profile_name"
+credentials_filename="${2:-$default_credentials_filename}"
+
+token_expire_ts=0
+timeout="+2H"
+if [ -f $credentials_filename ]; then
+    token_created_ts=$(echo "$(ls -lh $credentials_filename | tr -s ' ' | cut -d ' ' -f 6-8):00")
+    token_expire_ts=$(date -j -v $timeout -f "%B %d %H:%M:%S" "$token_created_ts" "+%s")
+fi
+
+current_ts=$(date +%s)
+
+if [ "$current_ts" -gt "$token_expire_ts" ]; then
+    echo "token expired. need to update"
+    get_credentials $profile_name $credentials_filename
+fi
