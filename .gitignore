@@ -18,6 +18,20 @@ vim/vim/.netrwhist
 *.bak
 
 # ---------------------------
+# AI agents
+# ---------------------------
+# Credentials and per-machine state must never land in this repo.
+ai-agents/**/.credentials.json
+ai-agents/**/auth.json
+ai-agents/**/history.jsonl
+ai-agents/**/sessions/
+ai-agents/**/projects/
+ai-agents/**/cache/
+# Anything explicitly marked machine-local (real home is ~/.dotfiles_local/).
+ai-agents/**/*.local.*
+*.backup
+
+# ---------------------------
 # macOS
 # ---------------------------
 # DS_Store files
