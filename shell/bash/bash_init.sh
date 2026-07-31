@@ -1,11 +1,19 @@
 #!/bin/bash
+# Links the bash config into $HOME.
+#   ./bash_init.sh              install
+#   ./bash_init.sh --uninstall  remove the links this script created
 
-[ -f "$HOME"/.bashrc ] && mv "$HOME"/.bashrc "$HOME"/.bashrc.backup
-ln -s "$PWD"/bashrc ~/.bashrc
+. "$(dirname "${BASH_SOURCE[0]}")/../../lib/dotfiles.sh"
+parse_mode "$@"
 
-[ -f "$HOME"/.bash_function ] && mv "$HOME"/.bash_function "$HOME"/.bash_function.backup
-ln -s "$PWD"/../common/common_function "$HOME"/.bash_function
+HERE="$DOTFILES_ROOT/shell/bash"
+COMMON="$DOTFILES_ROOT/shell/common"
 
-[ -f "$HOME"/.bash_alias ] && mv "$HOME"/.bash_alias "$HOME"/.bash_alias.backup
-ln -s "$PWD"/../common/common_alias "$HOME"/.bash_alias
+LINKS=(
+  "$HERE/bashrc|$HOME/.bashrc"
+  "$COMMON/common_function|$HOME/.bash_function"
+  "$COMMON/common_alias|$HOME/.bash_alias"
+)
 
+echo "bash ($MODE):"
+run_links "$MODE"

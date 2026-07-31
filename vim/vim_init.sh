@@ -1,36 +1,36 @@
 #!/bin/bash
+# Links the vim/nvim config into $HOME and pulls the plugin submodules.
+#   ./vim_init.sh              install
+#   ./vim_init.sh --uninstall  remove the links this script created
 
-# link config for vim
-VIM_CONFIG_PACK_DIR="$HOME"/.vim/pack
-[ -f "$VIM_CONFIG_PACK_DIR" ] && mv "$VIM_CONFIG_PACK_DIR" "$VIM_CONFIG_PACK_DIR".backup
-[ ! -d "$VIM_CONFIG_PACK_DIR" ] && mkdir -p "$VIM_CONFIG_PACK_DIR"
-ln -s "$PWD"/pack "$VIM_CONFIG_PACK_DIR"
+. "$(dirname "${BASH_SOURCE[0]}")/../lib/dotfiles.sh"
+parse_mode "$@"
 
-# link vimrc
-VIMRC_FILE="$HOME"/.vimrc
-[ -f "$VIMRC_FILE" ] && mv "$VIMRC_FILE" "$VIMRC_FILE".backup
-ln -s "$PWD"/vimrc "$VIMRC_FILE"
+HERE="$DOTFILES_ROOT/vim"
+NVIM_DIR="$HOME/.config/nvim"
 
-if command -v nvim &>/dev/null; then
-    NVIM_CONFIG_DIR="$HOME"/.config/nvim
-    [ ! -d "$NVIM_CONFIG_DIR" ] && mkdir -p "$NVIM_CONFIG_DIR"
+LINKS=(
+  "$HERE/pack|$HOME/.vim/pack"
+  "$HERE/vimrc|$HOME/.vimrc"
+)
 
-    # link config for nvim
-    NVIM_CONFIG_PACK_DIR="$NVIM_CONFIG_DIR"/pack
-    [ -f "$NVIM_CONFIG_PACK_DIR" ] && mv "$NVIM_CONFIG_PACK_DIR" "$NVIM_CONFIG_PACK_DIR".backup
-    ln -s "$PWD"/pack "$NVIM_CONFIG_PACK_DIR"
-
-    # # link nvimrc
-    # NVIMRC_FILE="$NVIM_CONFIG_DIR"/init.vim
-    # [ -f "$NVIMRC_FILE" ] && mv "$NVIMRC_FILE" "$NVIMRC_FILE".backup
-    # ln -s "$PWD"/nvimrc "$NVIMRC_FILE"
-else
-    echo "nvim not found — skip nvim config"
+# nvim shares the same pack directory. Only linked when nvim is installed, but
+# always listed when uninstalling so an old link is cleaned up even if nvim has
+# since been removed.
+if [ "$MODE" = uninstall ] || command -v nvim >/dev/null 2>&1; then
+  LINKS+=( "$HERE/pack|$NVIM_DIR/pack" )
+elif [ "$MODE" = install ]; then
+  echo "  (nvim not found — skipping $(tilde "$NVIM_DIR"))"
 fi
 
-# install submodules
-if command -v git &>/dev/null; then
-    git submodule update --init --recursive
-else
-    echo "git not found — can't pull submodules"
+echo "vim ($MODE):"
+run_links "$MODE"
+
+# Plugins live in submodules; only meaningful when installing.
+if [ "$MODE" = install ]; then
+  if command -v git >/dev/null 2>&1; then
+    git -C "$DOTFILES_ROOT" submodule update --init --recursive
+  else
+    echo "  git not found — can't pull submodules" >&2
+  fi
 fi

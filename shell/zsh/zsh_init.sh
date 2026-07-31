@@ -1,11 +1,23 @@
-#!/bin/zsh
+#!/bin/bash
+# Links the zsh config into $ZDOTDIR (or $HOME).
+#   ./zsh_init.sh              install
+#   ./zsh_init.sh --uninstall  remove the links this script created
+#
+# Runs under bash, not zsh — nothing here needs zsh, and the shared helpers use
+# BASH_SOURCE to locate the repo. $ZDOTDIR is still honoured when it is exported.
 
-[ -f "${ZDOTDIR:-$HOME}"/.zshrc ] && mv "${ZDOTDIR:-$HOME}"/.zshrc "${ZDOTDIR:-$HOME}"/.zshrc.backup
-ln -s "$PWD"/zshrc "${ZDOTDIR:-$HOME}"/.zshrc
+. "$(dirname "${BASH_SOURCE[0]}")/../../lib/dotfiles.sh"
+parse_mode "$@"
 
-[ -f "${ZDOTDIR:-$HOME}"/.zsh_function ] && mv "${ZDOTDIR:-$HOME}"/.zsh_function "${ZDOTDIR:-$HOME}"/.zsh_function.backup
-ln -s "$PWD"/../common/common_function "${ZDOTDIR:-$HOME}"/.zsh_function
+HERE="$DOTFILES_ROOT/shell/zsh"
+COMMON="$DOTFILES_ROOT/shell/common"
+ZDOT="${ZDOTDIR:-$HOME}"
 
-[ -f "${ZDOTDIR:-$HOME}"/.zsh_alias ] && mv "${ZDOTDIR:-$HOME}"/.zsh_alias "${ZDOTDIR:-$HOME}"/.zsh_alias.backup
-ln -s "$PWD"/../common/common_alias "${ZDOTDIR:-$HOME}"/.zsh_alias
+LINKS=(
+  "$HERE/zshrc|$ZDOT/.zshrc"
+  "$COMMON/common_function|$ZDOT/.zsh_function"
+  "$COMMON/common_alias|$ZDOT/.zsh_alias"
+)
 
+echo "zsh ($MODE):"
+run_links "$MODE"
