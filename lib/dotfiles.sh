@@ -112,7 +112,9 @@ unlink_all() {
 
 run_links() {
   local mode="$1" entry src dst
-  for entry in "${LINKS[@]}"; do
+  # ${a[@]+"${a[@]}"} rather than "${a[@]}": expanding an empty array under
+  # `set -u` is an error in bash 3.2, the /bin/bash macOS ships.
+  for entry in ${LINKS[@]+"${LINKS[@]}"}; do
     src="${entry%%|*}"
     dst="${entry#*|}"
     if [ "$mode" = uninstall ]; then unlink "$dst"; else link "$src" "$dst"; fi

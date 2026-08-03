@@ -73,6 +73,8 @@ if [ -d "$SKILLS_DIR" ]; then
   shopt -s nullglob
   skills=("$SKILLS_DIR"/*/)
   shopt -u nullglob
+  # The loop is skipped rather than entered with nothing: expanding an empty
+  # array under `set -u` is an error in bash 3.2, which macOS ships as /bin/bash.
   if [ ${#skills[@]} -eq 0 ]; then
     echo "  (no skills in shared/skills/ yet)"
   fi
@@ -80,7 +82,7 @@ if [ -d "$SKILLS_DIR" ]; then
   # — this repo, a team hub (e.g. elements/agents), personal folders. So never
   # take over a name we don't own: refresh our own links, warn and skip anything
   # else. Same rule the team's link-skills.sh follows, so the two can coexist.
-  for skill in "${skills[@]}"; do
+  for skill in ${skills[@]+"${skills[@]}"}; do
     src="${skill%/}"
     name="$(basename "$src")"
     for base in "${TOOL_DIRS[@]}"; do
