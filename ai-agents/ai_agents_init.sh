@@ -1,7 +1,7 @@
 #!/bin/bash
-# Mirrors the vim_init.sh / tmux_init.sh pattern: back up whatever is already
-# there, then symlink this repo's files into place.
-# Run from this directory:  cd <dotfiles>/ai-agents && ./ai_agents_init.sh
+# Links the AI agent config into each installed agent tool.
+#   ./ai_agents_init.sh              install
+#   ./ai_agents_init.sh --uninstall  remove what this script installed
 #
 # Layout:
 #   shared/   tool-neutral content (policy + Agent Skills) — reused by every tool
@@ -11,10 +11,11 @@
 # here. Adding another tool later = add its base dir to TOOL_DIRS (for skills)
 # and write a small <tool>_adapter function below.
 
-set -u
+. "$(dirname "${BASH_SOURCE[0]}")/../lib/dotfiles.sh"
+parse_mode "$@"
 
-REPO_DIR="$PWD"
-SHARED_DIR="$REPO_DIR/shared"
+HERE="$DOTFILES_ROOT/ai-agents"
+SHARED_DIR="$HERE/shared"
 SKILLS_DIR="$SHARED_DIR/skills"
 LOCAL_DIR="$HOME/.dotfiles_local/ai-agents"
 
@@ -26,60 +27,23 @@ TOOL_DIRS=(
   "$HOME/.claude"   # Claude Code
 )
 
-# --- helpers ----------------------------------------------------------------
-
-# True when $1 is a symlink we previously created (points inside this repo).
-# Those are replaced silently on re-run; anything else gets backed up.
-is_ours() {
-  local target="$1" dest
-  [ -L "$target" ] || return 1
-  dest="$(readlink "$target")"
-  case "$dest" in "$REPO_DIR"/*) return 0 ;; *) return 1 ;; esac
-}
-
-backup() {
-  local target="$1"
-  if is_ours "$target"; then
-    rm "$target"
-  elif [ -L "$target" ] || [ -e "$target" ]; then
-    mv "$target" "$target.backup"
-    echo "  backed up: $target -> $target.backup"
-  fi
-}
-
-link() {
-  local src="$1" dst="$2"
-  backup "$dst"
-  mkdir -p "$(dirname "$dst")"
-  ln -s "$src" "$dst"
-  echo "  linked:    $dst -> $src"
-}
-
-# settings.json and friends are rewritten by the agent at runtime (permission
-# prompts, /config). Symlinking them would let the tool edit the repo behind our
-# back, so those are copied instead — re-run this script to push repo changes.
-copy() {
-  local src="$1" dst="$2"
-  # Already in sync — do nothing, so re-running never clobbers an earlier
-  # .backup holding changes the app made.
-  if cmp -s "$src" "$dst"; then
-    echo "  unchanged: $dst"
-    return
-  fi
-  backup "$dst"
-  mkdir -p "$(dirname "$dst")"
-  cp "$src" "$dst"
-  echo "  copied:    $dst <- $src"
-}
-
 # --- Claude Code adapter ----------------------------------------------------
 
 claude_adapter() {
-  local base="$HOME/.claude" config="$REPO_DIR/claude"
+  local base="$HOME/.claude" config="$HERE/claude" hook
 
-  echo "Claude Code ($base):"
+  echo "Claude Code ($(tilde "$base")):"
   if [ ! -d "$base" ]; then
     echo "  not installed — skipped"
+    return
+  fi
+
+  if [ "$MODE" = uninstall ]; then
+    # This repo owns everything it links under ~/.claude, so a scan is safe here
+    # and picks up hooks added since. settings.json is a copy, not a link.
+    unlink_all "$base" 2
+    [ -f "$base/settings.json" ] && { rm "$base/settings.json"; echo "  removed:   $(tilde "$base")/settings.json"; }
+    rmdir "$base/shared" 2>/dev/null
     return
   fi
 
@@ -88,7 +52,6 @@ claude_adapter() {
   link "$SHARED_DIR/AGENTS.md" "$base/shared/AGENTS.md"
 
   # PreToolUse hooks — Claude Code is the only tool here that can hard-block.
-  local hook
   for hook in "$config"/hooks/*.sh; do
     [ -f "$hook" ] || continue
     chmod +x "$hook"
@@ -110,6 +73,8 @@ if [ -d "$SKILLS_DIR" ]; then
   shopt -s nullglob
   skills=("$SKILLS_DIR"/*/)
   shopt -u nullglob
+  # The loop is skipped rather than entered with nothing: expanding an empty
+  # array under `set -u` is an error in bash 3.2, which macOS ships as /bin/bash.
   if [ ${#skills[@]} -eq 0 ]; then
     echo "  (no skills in shared/skills/ yet)"
   fi
@@ -117,26 +82,26 @@ if [ -d "$SKILLS_DIR" ]; then
   # — this repo, a team hub (e.g. elements/agents), personal folders. So never
   # take over a name we don't own: refresh our own links, warn and skip anything
   # else. Same rule the team's link-skills.sh follows, so the two can coexist.
-  for skill in "${skills[@]}"; do
+  for skill in ${skills[@]+"${skills[@]}"}; do
     src="${skill%/}"
     name="$(basename "$src")"
     for base in "${TOOL_DIRS[@]}"; do
       [ -d "$base" ] || continue
       dest="$base/skills/$name"
-      if is_ours "$dest"; then
-        rm "$dest"
-        ln -s "$src" "$dest"
-        echo "  refreshed: $dest"
+      if [ "$MODE" = uninstall ]; then
+        unlink "$dest"
+      elif is_ours "$dest"; then
+        link "$src" "$dest"
       elif [ -L "$dest" ]; then
-        echo "  SKIPPED:   $dest already points elsewhere:" >&2
+        echo "  SKIPPED:   $(tilde "$dest") already points elsewhere:" >&2
         echo "             $(readlink "$dest")" >&2
         echo "             Rename one of the colliding skills, or remove the link and re-run." >&2
       elif [ -e "$dest" ]; then
-        echo "  SKIPPED:   $dest exists and is not a symlink (personal skill?)." >&2
+        echo "  SKIPPED:   $(tilde "$dest") exists and is not a symlink (personal skill?)." >&2
       else
         mkdir -p "$(dirname "$dest")"
         ln -s "$src" "$dest"
-        echo "  linked:    $dest -> $src"
+        echo "  linked:    $(tilde "$dest") -> $(tilde "$src")"
       fi
     done
   done
@@ -144,11 +109,19 @@ else
   echo "  (no shared/skills/ directory yet)"
 fi
 
+if [ "$MODE" = uninstall ]; then
+  echo ""
+  echo "Left alone: $(tilde "$LOCAL_DIR") (machine-local notes are not ours to delete)"
+  echo ""
+  echo "Done."
+  exit 0
+fi
+
 # Machine-local additions: anything dropped into ~/.dotfiles_local/ai-agents/ is
 # collected into an index the adapters import. Keeps work-machine-only or
 # secret-ish context out of this repo.
 echo ""
-echo "Machine-local index ($LOCAL_DIR/index.md):"
+echo "Machine-local index ($(tilde "$LOCAL_DIR")/index.md):"
 mkdir -p "$LOCAL_DIR"
 INDEX="$LOCAL_DIR/index.md"
 

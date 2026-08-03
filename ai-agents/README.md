@@ -4,7 +4,7 @@ Config for AI coding agents, kept tool-agnostic where the tools allow it.
 
 ```
 ai-agents/
-├── ai_agents_init.sh   # backup + symlink into place (same pattern as vim/tmux)
+├── ai_agents_init.sh   # install/uninstall, on the shared lib/dotfiles.sh helpers
 ├── shared/             # tool-neutral — no single tool's syntax belongs here
 │   ├── AGENTS.md       # global development policy (the actual content)
 │   └── skills/         # Agent Skills — one folder per skill, each with SKILL.md
@@ -81,11 +81,17 @@ per-machine trusted paths.
 ## Install
 
 ```bash
-cd ai-agents && ./ai_agents_init.sh   # or: make aiagentsinit
+make aiagentsinit     # or: ./ai_agents_init.sh   (runs from any directory)
+make aiagentsclean    # or: ./ai_agents_init.sh --uninstall
 ```
 
-Re-running is safe. Symlinks this script created are replaced silently;
-anything else found in the way is moved to `<name>.backup` first.
+Re-running is safe and reports `unchanged`. Links this script created are
+refreshed in place; anything else found in the way is moved to `<name>.backup`
+first. Uninstalling removes only links pointing into this repo, plus the copied
+`settings.json` — a team hub's links and your own folders are left alone.
+
+The install and uninstall logic is shared with the other init scripts via
+[`lib/dotfiles.sh`](../lib/dotfiles.sh).
 
 `settings.json` is **copied**, not symlinked, because Claude Code rewrites it at
 runtime (permission prompts, `/config`) — a symlink would let it edit the repo.
