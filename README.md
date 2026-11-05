@@ -38,12 +38,13 @@ there yourself, and links belonging to anything else, are left alone.
 
 ```
 lib/dotfiles.sh   shared install/uninstall helpers, sourced by every script
+bin/              commands put on PATH by zshrc/bashrc (e.g. aws-sso)
 shell/
   bash/ zsh/      per-shell rc + init script
   common/         functions and aliases shared by both shells
 vim/ tmux/        config + init script
 ai-agents/        AI agent config (its own README)
-docs/             notes, e.g. per-project git identity
+docs/             notes, e.g. per-project git identity, AWS SSO
 ```
 
 Each tool directory owns a `*_init.sh` that both installs and uninstalls it
@@ -63,3 +64,4 @@ directory:
 - `~/.custom_zshrc/` — every file in it is sourced by `zshrc`, in name order
 - `~/.dotfiles_local/ai-agents/*.md` — extra agent context, never committed
 - Per-project git identity — see [docs/local_git_configuration.md](docs/local_git_configuration.md)
+- AWS SSO defaults (`AWS_SSO_*`) and the generated alias file — see [docs/aws_sso.md](docs/aws_sso.md)
