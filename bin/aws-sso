@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# aws-sso <profile> — make sure the SSO session behind <profile> is usable,
+# running `aws sso login` only when the cached session can no longer produce
+# credentials. Expiry times come from the AWS CLI itself, not a fixed TTL.
+#
+# Credentials are never printed or written anywhere: the shell only needs
+# AWS_PROFILE, and the AWS CLI/SDKs resolve and refresh keys on their own.
+# Pair it with a shell function that exports the profile, e.g.:
+#
+#   aws_use() { aws-sso "$1" && export AWS_PROFILE="$1"; }
+#
+# (aws-sso-profiles -A <file> generates one, plus per-profile aliases.)
+#
+# All output goes to stderr, so stdout stays empty.
+set -eu
+
+say() { printf '%s\n' "$*" >&2; }
+die() { say "aws-sso: $*"; exit 1; }
+
+usage() {
+  cat >&2 <<USAGE
+usage: ${0##*/} [-f] <profile>
+
+  -f  force a fresh \`aws sso login\` even if the session is still valid
+USAGE
+  exit 2
+}
+
+FORCE=0
+while getopts ':fh' opt; do
+  case $opt in
+    f) FORCE=1 ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND - 1))
+[ $# -ge 1 ] || usage
+profile=$1
+# A second argument (the old credentials-file path) is accepted and ignored.
+
+command -v aws >/dev/null || die "aws cli not found"
+command -v jq  >/dev/null || die "jq not found"
+
+aws configure list-profiles 2>/dev/null | grep -qxF "$profile" \
+  || die "no profile '$profile' in ~/.aws/config"
+
+# ISO-8601 timestamp on stdin -> epoch seconds. Handles the forms the CLI
+# writes: 2026-11-04T22:32:10Z, ...+00:00, ...UTC, and fractional seconds.
+to_epoch() {
+  jq -Rr 'sub("\\.[0-9]+"; "") | sub("(\\+00:00|UTC)$"; "Z") | fromdateiso8601' 2>/dev/null
+}
+
+# Expiration of the role credentials. The keys only pass through the pipe into
+# jq, which keeps just the Expiration field. Empty output means the CLI could
+# not get credentials (SSO session expired or never logged in).
+role_expiry() {
+  aws configure export-credentials --profile "$profile" --format process 2>/dev/null \
+    | jq -r '.Expiration // empty' 2>/dev/null | to_epoch
+}
+
+# Expiry of the cached SSO access token for this profile's start URL, as
+# "<epoch> <1|0>" where the flag says whether a refresh token is cached
+# (sso-session profiles): then the CLI renews the access token silently.
+sso_expiry() {
+  config=${AWS_CONFIG_FILE:-$HOME/.aws/config}
+  session=$(aws configure get sso_session --profile "$profile" 2>/dev/null || true)
+  if [ -n "$session" ]; then
+    # `aws configure get` cannot read [sso-session] blocks; parse the ini.
+    start_url=$(awk -v sect="[sso-session $session]" '
+      /^[[:space:]]*\[/ { in_sect = ($0 == sect); next }
+      in_sect && /^[[:space:]]*sso_start_url[[:space:]]*=/ {
+        sub(/^[^=]*=[[:space:]]*/, ""); sub(/[[:space:]]+$/, ""); print; exit
+      }' "$config")
+  else
+    start_url=$(aws configure get sso_start_url --profile "$profile" 2>/dev/null || true)
+  fi
+  [ -n "$start_url" ] || return 0
+  for f in "$HOME"/.aws/sso/cache/*.json; do
+    [ -f "$f" ] || continue
+    jq -r --arg u "$start_url" \
+      'select(.accessToken and .expiresAt and (.startUrl // "") == $u)
+       | "\(.expiresAt) \(if .refreshToken then 1 else 0 end)"' "$f" 2>/dev/null
+  done | while read -r ts refresh; do
+    printf '%s %s\n' "$(printf '%s' "$ts" | to_epoch)" "$refresh"
+  done | sort -n | tail -1
+}
+
+# epoch -> "15:04 (in 2h13m)"
+fmt() {
+  [ -n "${1:-}" ] || { printf 'unknown'; return; }
+  when=$(date -r "$1" '+%H:%M' 2>/dev/null || date -d "@$1" '+%H:%M')
+  left=$(( $1 - $(date +%s) ))
+  if [ "$left" -le 0 ]; then
+    printf '%s (expired)' "$when"
+  else
+    printf '%s (in %dh%02dm)' "$when" $((left / 3600)) $((left % 3600 / 60))
+  fi
+}
+
+role_ep=
+[ "$FORCE" -eq 1 ] || role_ep=$(role_expiry)
+
+if [ -z "$role_ep" ]; then
+  say "==> logging in to SSO for $profile"
+  # Device-code prompt goes to stderr so stdout stays clean.
+  aws sso login --profile "$profile" >&2 || die "aws sso login failed"
+  role_ep=$(role_expiry)
+  [ -n "$role_ep" ] || die "still no credentials for $profile after login"
+fi
+
+set -- $(sso_expiry)
+sso_note=
+[ "${2:-0}" = 1 ] && sso_note=", auto-refreshes"
+say "$profile: role creds until $(fmt "$role_ep"), SSO token until $(fmt "${1:-}")$sso_note"

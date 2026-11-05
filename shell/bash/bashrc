@@ -29,3 +29,12 @@ export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+# ~/.bashrc is a symlink into the repo; resolve it to put <repo>/bin on PATH.
+_bashrc=${BASH_SOURCE[0]}
+[ -L "$_bashrc" ] && _bashrc=$(readlink "$_bashrc")
+DOTFILES_BIN="$(cd "$(dirname "$_bashrc")/../.." 2>/dev/null && pwd)/bin"
+if [ -d "$DOTFILES_BIN" ]; then
+    case ":$PATH:" in *":$DOTFILES_BIN:"*) ;; *) PATH="$DOTFILES_BIN:$PATH" ;; esac
+fi
+unset _bashrc
+

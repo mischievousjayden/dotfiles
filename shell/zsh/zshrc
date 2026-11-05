@@ -116,6 +116,16 @@ export EDITOR="$VISUAL"
 
 
 ###############################################################################
+#                              setup dotfiles bin                             #
+###############################################################################
+# ~/.zshrc is a symlink into the repo; :A resolves it, so this is <repo>/bin.
+DOTFILES_BIN="${${(%):-%x}:A:h:h:h}/bin"
+if [ -d "$DOTFILES_BIN" ]; then
+    case ":$PATH:" in *":$DOTFILES_BIN:"*) ;; *) PATH="$DOTFILES_BIN:$PATH" ;; esac
+fi
+
+
+###############################################################################
 #                              setup custom zshrc                             #
 ###############################################################################
 # Folder containing custom zshrc files
